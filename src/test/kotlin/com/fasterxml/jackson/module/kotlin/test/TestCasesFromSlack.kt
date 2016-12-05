@@ -2,8 +2,10 @@ package com.fasterxml.jackson.module.kotlin.test
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.*
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.junit.Test
 
 class TestCasesFromSlack1 {
@@ -21,6 +23,10 @@ class TestCasesFromSlack1 {
             @param:JsonProperty("name") @get:JsonProperty("name") val name: String,
             @param:JsonProperty("rsvp") @get:JsonProperty("rsvp") var rsvp: RSVP)
 
+    data class Bomb(val word: String)
+    data class Boom(@JsonUnwrapped var value: Bomb?)
+    data class Boom2(@JsonUnwrapped var value: Bomb)
+
     enum class RSVP(val nameKey: String) {
         going("rsvp.going"), maybe("rsvp.maybe"), interested("rsvp.interested")
     }
@@ -33,6 +39,19 @@ class TestCasesFromSlack1 {
         val event2: Event = jacksonObjectMapper().readValue("""
            {"host":{"id":"host123","name":"A Czar"},"activity":"Kotlin Programming","invited":[{"id":"Guest1","name":"Mr Kotlin","rsvp": "going"}]}
         """)
+
+        val boom: Boom = jacksonObjectMapper().readValue("""
+           {
+                "word": "HI"
+            }
+        """)
+        print(boom)
+        val boom2: Boom2 = jacksonObjectMapper().readValue("""
+           {
+                "word": "HI"
+            }
+        """)
+        print(boom2)
     }
 }
 
